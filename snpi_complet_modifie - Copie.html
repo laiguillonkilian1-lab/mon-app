@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ordre de Bataille — Final (Bleu)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --muted:#6b7280;
+  --accent:#0f1724;
+  --primary:#4263eb;
+  --danger:#ff6b6b;
+  --input-border:#e6eefc;
+}
+*{box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
+body{margin:0;background:var(--bg);color:var(--accent)}
+.header{background:#0f1724;color:white;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
+.header h1{margin:0;font-size:22px;letter-spacing:1px}
+.btn{background:transparent;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(66,99,235,0.18)}
+.container{max-width:1200px;margin:28px auto;padding:0 20px}
+.tabs{display:flex;gap:12px;margin-bottom:18px}
+.tab{padding:10px 18px;border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);font-weight:700;border:1px solid rgba(0,0,0,0.03)}
+.tab.active{background:#fff;color:var(--accent);box-shadow:0 10px 30px rgba(2,6,23,0.05)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 8px 24px rgba(6,12,32,0.06)}
+.headerRow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.avatar{width:64px;height:64px;border-radius:12px;overflow:hidden;background:#d0d7ff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.name{font-weight:800;font-size:18px}
+.small{color:var(--muted);font-size:13px}
+.rowItem{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #f1f5f9}
+.controls{display:flex;gap:8px;margin-top:10px}
+.btn.warn{background:#ffe8e6;color:#b02a37}
+.btn.primary{background:#4263eb;color:white;}
+.top-right-fab{position:fixed;right:26px;bottom:26px;padding:14px 18px;border-radius:12px;background:var(--primary);color:white;border:none;box-shadow:0 18px 40px rgba(66,99,235,0.18);cursor:pointer}
+.modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:90}
+.modal{background:white;border-radius:12px;max-width:880px;width:100%;padding:18px;box-shadow:0 24px 60px rgba(2,6,23,0.4);max-height:90vh;overflow:auto}
+.form-grid{display:grid;gap:12px}
+.member-card{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#eaf0ff;border:1px solid #d0dcff;border-radius:10px;padding:6px 10px;cursor:pointer;transition:0.2s}
+.member-card.checked{background:#d8e1ff;border-color:#4263eb}
+.member-card .info{display:flex;align-items:center;gap:8px}
+.member-card .avatar-small{width:36px;height:36px;border-radius:8px;background:#4263eb;color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+.member-card img{width:36px;height:36px;border-radius:8px;object-fit:cover}
+.org-thumb{width:160px;height:100px;border-radius:8px;overflow:hidden;background:#f4f7fb;display:flex;align-items:center;justify-content:center;color:#123a56}
+.preview-mission{background:linear-gradient(180deg,#fff,#fbfdff);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+@media (max-width:900px){ .grid{grid-template-columns:1fr} .member-card{font-size:14px} }
+
+/* NEW: Modal form layout like screenshot */
+.form-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+.form-field{display:flex;flex-direction:column;gap:6px}
+.form-field label{font-size:13px;color:var(--muted);font-weight:700}
+.form-field input[type="text"], .form-field input[type="file"], .form-field textarea{padding:10px;border-radius:10px;border:1px solid var(--input-border);background:#fff;outline:none;font-size:14px}
+.form-field textarea{resize:vertical;padding-top:10px}
+.file-row{display:flex;gap:12px;align-items:center}
+.photo-preview{width:92px;height:92px;border-radius:50%;overflow:hidden;background:#eef3ff;display:flex;align-items:center;justify-content:center;border:4px solid #fff;box-shadow:0 8px 24px rgba(66,99,235,0.12)}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+.btn.secondary{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:10px 14px;border-radius:10px}
+.helper{font-size:13px;color:var(--muted)}
+.input-inline{display:flex;gap:8px}
+.full-width{grid-column:1/-1}
+.kv{color:var(--muted);font-size:13px}
+.notice{font-size:13px;color:var(--muted);margin-top:6px}
+</style>
+
+<link rel="manifest" href="manifest.json">
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+</head>
+<body>
+<div class="header">
+  <h1>ORDRE DE BATAILLE</h1>
+  <div>
+    <button id="exportPdf" class="btn primary">Exporter en PDF</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" data-view="personnel">PERSONNEL</div>
+    <div class="tab" data-view="equipes">POSTES</div>
+    <div class="tab" data-view="organigrammes">ORGANIGRAMMES</div>
+  </div>
+
+  <div id="view"></div>
+</div>
+
+<button class="top-right-fab" id="addBtn">＋ Ajouter</button>
+
+<div id="modalRoot" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 id="modalTitle" style="margin:0">Ajouter</h3>
+      <button id="closeModal" style="background:transparent;border:none;font-size:20px;cursor:pointer">✕</button>
+    </div>
+    <div id="modalBody"></div>
+    <div class="form-actions" style="margin-top:12px">
+      <button id="cancelModal" class="btn secondary">Annuler</button>
+      <button id="saveModal" class="btn primary">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="pdfRoot" style="position:fixed;left:-9999px;top:-9999px;width:800px"></div>
+
+<script>
+/* ---------- data + helpers (conserved) ---------- */
+const LS_KEY='odb_final_bleu';
+const DEFAULT = {
+ p: [
+  {id:'p4', nom:'BONNOT', grade:'LTN', poste:'CDP', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p5', nom:'PETIBON', grade:'MJR', poste:'CDPA', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p6', nom:'BRACHET', grade:'ADJ/C', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p7', nom:'CHALM', grade:'ADJ', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p8', nom:'BOURAS', grade:'ADJ', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p9', nom:'CROISSANT', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p10', nom:'LAIGUILLON', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p11', nom:'FRANKE', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p12', nom:'BERRUE', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p13', nom:'POINTEAU', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p14', nom:'MEAL', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p15', nom:'CUVILLIER', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p16', nom:'SIMON', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p17', nom:'MARTY', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p18', nom:'PORTUGAL', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p19', nom:'RICHAR', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p20', nom:'PETIT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p21', nom:'ROPARS', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p22', nom:'VIRMONT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p23', nom:'PLAUD', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p24', nom:'MERIEAU', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
+  {id:'p25', nom:'FERRIOT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null}
+],
+  e: [
+    {id:'e1',name:'INDIA 1',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
+    {id:'e2',name:'INDIA 2',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
+    {id:'e3',name:'INDIA 3',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
+  ],
+  o: [
+    {id:'o1',title:'Fiche synthèse mission',image:null,notes:'',mission:'Opération Mistral',date:'18/11/2025',time:'09:30',lieu:'Zone Delta',radio:'Canal 3',tenue:'Tenue de combat',repas:'12:30'}
+  ]
+};
+let state = JSON.parse(localStorage.getItem(LS_KEY) || JSON.stringify(DEFAULT));
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+function uid(pref='id'){ return pref+'-'+Math.random().toString(36).slice(2,9); }
+function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function displayName(p){
+  if(!p) return '';
+  if(p.prenom && p.nom) return (p.prenom + ' ' + p.nom).trim();
+  if(p.nom) {
+    const parts = String(p.nom).trim().split(/\s+/);
+    if(parts.length>=2) return parts[0] + ' ' + parts.slice(1).join(' ');
+    return p.nom;
+  }
+  return '';
+}
+
+/* -----------------------------------------
+   IndexedDB pour stocker les photos (BLOBS)
+------------------------------------------*/
+const DB_NAME = 'odb_photos_db';
+const STORE_NAME = 'photos';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(STORE_NAME);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function savePhoto(id, blob) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).put(blob, id);
+    tx.oncomplete = resolve;
+    tx.onerror = reject;
+  });
+}
+
+async function loadPhoto(id) {
+  if (!id) return null;
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readonly");
+    const req = tx.objectStore(STORE_NAME).get(id);
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = reject;
+  });
+}
+
+async function deletePhoto(id) {
+  if (!id) return;
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(id);
+    tx.oncomplete = resolve;
+    tx.onerror = reject;
+  });
+}
+
+/* ---------- rendering ---------- */
+const view = document.getElementById('view');
+
+async function renderPersonnel(){
+  addBtn.style.display='block';
+  let html = '<div class="grid">';
+
+  for (const p of state.p) {
+    let photoURL = "";
+    if (p.photoId) {
+      try {
+        const blob = await loadPhoto(p.photoId);
+        if (blob) photoURL = URL.createObjectURL(blob);
+      } catch(e){
+        console.warn('photo load err', e);
+      }
+    }
+
+    const name = displayName(p);
+    html += `<div class="card"><div class="headerRow"><div class="avatar">${photoURL?`<img src="${photoURL}">`:(name||'')[0]||'?'}</div><div><div class="name">${esc(name)}</div><div class="small">${esc(p.grade)}</div></div></div>
+    <div class="rowItem"><div>Poste</div><div>${esc(p.poste||'')}</div></div>
+    <div class="rowItem"><div>Armement</div><div>${esc(p.weapon||'')}</div></div>
+    <div class="rowItem"><div>Matériels</div><div>${esc(p.items||'')}</div></div>
+    <div class="controls"><button class="btn primary editP" data-id="${p.id}">Modifier</button><button class="btn warn delP" data-id="${p.id}">Supprimer</button></div></div>`;
+  }
+  html += '</div>';
+  view.innerHTML = `<div><h2 class="name">Personnel</h2>${html}</div>`;
+
+  document.querySelectorAll('.editP').forEach(b=>b.onclick=()=>openModal('personnel',b.dataset.id));
+  document.querySelectorAll('.delP').forEach(b=>b.onclick=async ()=>{ if(confirm('Supprimer ce personnel ?')){ const p = state.p.find(x=>x.id===b.dataset.id); if (p && p.photoId) await deletePhoto(p.photoId); state.p = state.p.filter(x=>x.id!==b.dataset.id); save(); renderPersonnel(); }});
+}
+
+function renderEquipes(){
+  addBtn.style.display='none';
+  let html = '<div class="grid">';
+  state.e.forEach(eq=>{
+    html += `<div class="card"><div class="name">${esc(eq.name)}</div><div class="small">VL: ${esc(eq.vl||'')}</div>
+      <div class="rowItem"><div>Pilote</div><div>${esc(eq.pilot||'')}</div></div>
+      <div class="rowItem"><div>Commandant</div><div>${esc(eq.commander||'')}</div></div>
+      <div class="small">Membres:</div><ul>${(eq.members||[]).map(m=>`<li>${esc(m)}</li>`).join('')}</ul>
+      <div class="controls"><button class="btn primary editE" data-id="${eq.id}">Modifier</button><button class="btn warn delE" data-id="${eq.id}">Supprimer</button></div></div>`;
+  });
+  html += '</div>';
+  view.innerHTML = `<div><h2 class="name">Postes</h2>${html}</div>`;
+  document.querySelectorAll('.editE').forEach(b=>b.onclick=()=>openModal('poste',b.dataset.id));
+  document.querySelectorAll('.delE').forEach(b=>b.onclick=()=>{ if(confirm('Supprimer cette poste ?')){ state.e = state.e.filter(x=>x.id!==b.dataset.id); save(); renderEquipes(); }});
+}
+
+function renderOrganigrammes(){
+  addBtn.style.display='none';
+  const o = state.o[0] || {};
+  let html = `<div class="card preview-mission"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+    <div style="flex:1"><h3 style="margin:0">FICHE SYNTHÈSE MISSION</h3><div class="small">Aperçu</div>
+    <div style="margin-top:12px"><strong>Mission:</strong> ${esc(o.mission||'')}</div>
+    <div style="margin-top:6px"><strong>Date:</strong> ${esc(o.date||'')}</div>
+    <div style="margin-top:6px"><strong>Heure:</strong> ${esc(o.time||'')}</div>
+    <div style="margin-top:6px"><strong>Lieu:</strong> ${esc(o.lieu||'')}</div></div>
+    <div style="width:220px">${o.image?`<img src="${o.image}" style="width:100%;height:140px;object-fit:cover;border-radius:8px">`:'<div class="org-thumb">No image</div>'}</div>
+    </div>
+    <div style="margin-top:12px"><strong>Notes:</strong><div>${esc(o.notes||'')}</div></div></div>`;
+  view.innerHTML = `<div><h2 class="name">Organigrammes</h2>${html}</div>`;
+  // add edit button
+  const editBtn = document.createElement('button');
+  editBtn.textContent = 'Modifier la fiche mission';
+  editBtn.className = 'btn ghost';
+  editBtn.onclick = ()=>openModal('organigramme', state.o[0]?.id || null);
+  view.querySelector('.card.preview-mission').prepend(editBtn);
+}
+
+/* tabs */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const v = t.dataset.view; if(v==='personnel') renderPersonnel(); if(v==='equipes') renderEquipes(); if(v==='organigrammes') renderOrganigrammes(); }));
+
+// initial view
+renderPersonnel();
+
+/* ---------- modal logic (new unified style) ---------- */
+const modalRoot = document.getElementById('modalRoot'), modalBody = document.getElementById('modalBody'), modalTitle = document.getElementById('modalTitle');
+document.getElementById('addBtn').addEventListener('click', ()=>{ const v = document.querySelector('.tab.active').dataset.view; openModal(v, null); });
+document.getElementById('closeModal').addEventListener('click', ()=>{ closeModal(); });
+document.getElementById('cancelModal').addEventListener('click', ()=>{ closeModal(); });
+let currentEdit = null;
+
+function closeModal(){
+  modalRoot.style.display='none';
+  currentEdit=null;
+  modalBody.innerHTML='';
+}
+
+/* openModal builds a nicer form per kind */
+function openModal(kind, id=null){
+  currentEdit = {kind,id};
+  modalTitle.textContent = (id ? 'Modifier ' : 'Ajouter ') + (kind==='personnel'?'personne': kind==='poste'?'poste':'organigramme');
+  modalBody.innerHTML = '';
+  if(kind==='personnel'){
+    // find existing or default
+    const p = id ? state.p.find(x=>x.id===id) : {nom:'',prenom:'',grade:'',poste:'',weapon:'',items:'',photoId:null};
+    // heuristic split if only single name present
+    let prenom = p.prenom || '';
+    let nom = p.nom || '';
+    if(!p.prenom && p.nom){
+      const parts = String(p.nom).trim().split(/\s+/);
+      if(parts.length>=2){ prenom = parts[0]; nom = parts.slice(1).join(' '); }
+    }
+    modalBody.innerHTML = `
+      <div class="form-grid">
+        <div class="form-two-col">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div class="photo-preview" id="previewPhoto">${p.photoId?`<img id="modalPreviewImg" src="">`:`<div style="font-weight:800;color:#1e293b">${(displayName(p)||'?')[0]}</div>`}</div>
+              <div style="flex:1">
+                <div class="file-row">
+                  <label class="helper" for="m_photo_input">Photo (optionnel)</label>
+                </div>
+                <div style="margin-top:6px" class="kv">Choisir une photo depuis l'appareil. Elle sera stockée localement (IndexedDB).</div>
+                <div style="margin-top:8px"><input id="m_photo_input" type="file" accept="image/*"></div>
+              </div>
+            </div>
+            <div class="notice">Aperçu circulaire, la photo est sauvegardée dans IndexedDB.</div>
+          </div>
+          <div>
+            <div class="form-two-col" style="grid-template-columns:1fr 1fr;gap:8px">
+              <div class="form-field"><label>Nom</label><input id="m_nom" type="text" value="${esc(nom)}" placeholder="Durand"></div>
+              <div class="form-field"><label>Prénom</label><input id="m_prenom" type="text" value="${esc(prenom)}" placeholder="Alexandre"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="form-two-col" style="grid-template-columns:1fr 1fr;gap:8px">
+              <div class="form-field"><label>Grade</label><input id="m_grade" type="text" value="${esc(p.grade||'')}" placeholder="Capitaine"></div>
+              <div class="form-field"><label>Poste (code)</label><input id="m_poste" type="text" value="${esc(p.poste||'')}" placeholder="A03"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="form-two-col" style="grid-template-columns:1fr 1fr;gap:8px">
+              <div class="form-field"><label>Armement</label><input id="m_weapon" type="text" value="${esc(p.weapon||'')}" placeholder="FAMAS"></div>
+              <div class="form-field"><label>Matériels</label><input id="m_items" type="text" value="${esc(p.items||'')}" placeholder="GPS"></div>
+            </div>
+          </div>
+        </div>
+        <div class="full-width form-field"><label>Notes</label><textarea id="m_notes" rows="3" placeholder="Rôle, capacités...">${esc(p.notes||'')}</textarea></div>
+      </div>
+    `;
+    // wire photo input preview
+    const input = modalBody.querySelector('#m_photo_input');
+    const preview = modalBody.querySelector('#previewPhoto');
+    input.addEventListener('change', (ev)=>{
+      const f = ev.target.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = e => {
+        // set preview img or replace content
+        if(preview.querySelector('img')) preview.querySelector('img').src = e.target.result;
+        else preview.innerHTML = `<img id="modalPreviewImg" src="${e.target.result}">`;
+        // store the file object on the input element for finalize
+        input._file = f;
+      };
+      r.readAsDataURL(f);
+    });
+    // load existing photo if available
+    if(p.photoId){
+      loadPhoto(p.photoId).then(blob=>{
+        if(blob){
+          const url = URL.createObjectURL(blob);
+          const img = modalBody.querySelector('#modalPreviewImg');
+          if(img) img.src = url;
+        }
+      }).catch(()=>{});
+    }
+  }
+
+  if(kind==='poste'){
+    const e = id? state.e.find(x=>x.id===id) : {name:'',vl:'',pilot:'',commander:'',members:[]};
+    modalBody.innerHTML = `
+      <div class="form-grid">
+        <div class="form-two-col">
+          <div class="form-field"><label>Nom poste</label><input id="m_name" type="text" value="${esc(e.name||'')}" placeholder="INDIA 1"></div>
+          <div class="form-field"><label>Immat / VL</label><input id="m_vl" type="text" value="${esc(e.vl||'')}" placeholder="AB-111-AA"></div>
+        </div>
+        <div class="form-two-col">
+          <div class="form-field"><label>Pilote</label><input id="m_pilot" type="text" value="${esc(e.pilot||'')}" placeholder="Jean Dupont"></div>
+          <div class="form-field"><label>Commandant</label><input id="m_commander" type="text" value="${esc(e.commander||'')}" placeholder="Sophie Moreau"></div>
+        </div>
+        <div class="full-width form-field">
+          <label>Membres</label>
+          <div id="m_members_list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;"></div>
+          <div class="notice">Cochez les membres appartenant à cette poste.</div>
+        </div>
+      </div>
+    `;
+    const list = modalBody.querySelector('#m_members_list');
+    state.p.forEach(p=>{
+      const card = document.createElement('label');
+      card.className = 'member-card';
+      const info = document.createElement('div'); info.className='info';
+      const av = document.createElement('div'); av.className='avatar-small';
+      if(p.photoId){ 
+        const img = document.createElement('img'); 
+        img.src = ''; // will set async
+        av.innerHTML=''; av.appendChild(img); 
+        loadPhoto(p.photoId).then(blob=>{ if(blob) img.src = URL.createObjectURL(blob); }).catch(()=>{});
+      } else av.textContent = (displayName(p)||'?')[0];
+      const txt = document.createElement('div'); txt.innerHTML = `<div style="font-weight:700;color:#1e293b">${esc(displayName(p))}</div><div style="font-size:12px;color:#475569">${esc(p.grade||'')}</div>`;
+      info.appendChild(av); info.appendChild(txt);
+      const cb = document.createElement('input'); cb.type='checkbox'; cb.value = displayName(p);
+      if((e.members||[]).includes(displayName(p))){ cb.checked = true; card.classList.add('checked'); }
+      cb.addEventListener('change', ()=> card.classList.toggle('checked', cb.checked) );
+      card.appendChild(info); card.appendChild(cb);
+      list.appendChild(card);
+    });
+  }
+
+  if(kind==='organigramme'){
+    const o = id? state.o.find(x=>x.id===id) : state.o[0] || {title:'',image:null,notes:'',mission:'',date:'',time:'',lieu:'',radio:'',tenue:'',repas:''};
+    modalBody.innerHTML = `
+      <div class="form-grid">
+        <div class="form-two-col">
+          <div class="form-field"><label>Titre</label><input id="m_title" type="text" value="${esc(o.title||'')}" placeholder="Fiche synthèse mission"></div>
+          <div class="form-field"><label>Image (optionnelle)</label><input id="m_image" type="file" accept="image/*"></div>
+        </div>
+        <div class="form-two-col">
+          <div class="form-field"><label>Mission</label><input id="m_mission" type="text" value="${esc(o.mission||'')}"></div>
+          <div class="form-field"><label>Date</label><input id="m_date" type="text" value="${esc(o.date||'')}"></div>
+        </div>
+        <div class="form-two-col">
+          <div class="form-field"><label>Heure</label><input id="m_time" type="text" value="${esc(o.time||'')}"></div>
+          <div class="form-field"><label>Lieu</label><input id="m_lieu" type="text" value="${esc(o.lieu||'')}"></div>
+        </div>
+        <div class="form-two-col">
+          <div class="form-field"><label>Radio</label><input id="m_radio" type="text" value="${esc(o.radio||'')}"></div>
+          <div class="form-field"><label>Tenue</label><input id="m_tenue" type="text" value="${esc(o.tenue||'')}"></div>
+        </div>
+        <div class="form-two-col">
+          <div class="form-field"><label>Repas</label><input id="m_repas" type="text" value="${esc(o.repas||'')}"></div>
+          <div style="padding:8px" class="kv">Aperçu image (si fournie) sera affiché dans la fiche.</div>
+        </div>
+        <div class="full-width form-field"><label>Notes</label><textarea id="m_notes_o" rows="3">${esc(o.notes||'')}</textarea></div>
+      </div>
+    `;
+    // image preview handling
+    const input = modalBody.querySelector('#m_image');
+    const wrapper = document.createElement('div');
+    wrapper.style.marginTop = '8px';
+    if(o.image) wrapper.innerHTML = `<img src="${o.image}" style="width:240px;border-radius:8px">`;
+    modalBody.appendChild(wrapper);
+    input.addEventListener('change', (ev)=>{
+      const f = ev.target.files[0];
+      if(!f) return;
+      const r = new FileReader();
+      r.onload = e => { wrapper.innerHTML = `<img src="${e.target.result}" style="width:240px;border-radius:8px">`; wrapper.dataset.src = e.target.result; };
+      r.readAsDataURL(f);
+    });
+    if(o.image) wrapper.dataset.src = o.image;
+  }
+
+  modalRoot.style.display='flex';
+}
+
+/* ---------- saveModal handles all three types ---------- */
+document.getElementById('saveModal').addEventListener('click', async ()=>{
+  if(!currentEdit) return;
+  const k = currentEdit.kind;
+  if(k==='personnel'){
+    const nomVal = document.getElementById('m_nom').value.trim();
+    const prenomVal = document.getElementById('m_prenom').value.trim();
+    if(!nomVal && !prenomVal){ alert('Au moins le Nom ou le Prénom est requis'); return; }
+    const grade = document.getElementById('m_grade').value.trim();
+    const poste = document.getElementById('m_poste').value.trim();
+    const weapon = document.getElementById('m_weapon').value.trim();
+    const items = document.getElementById('m_items').value.trim();
+    const notes = document.getElementById('m_notes') ? document.getElementById('m_notes').value.trim() : '';
+    // photo
+    const photoInput = modalBody.querySelector('#m_photo_input');
+    const file = photoInput ? photoInput._file || (photoInput.files && photoInput.files[0]) : null;
+
+    const finalize = async (blobFile) =>{
+      let photoId = currentEdit.id ? (state.p.find(x => x.id === currentEdit.id)?.photoId || uid('ph')) : uid('ph');
+
+      if (blobFile) {
+        // store file blob in IndexedDB
+        try {
+          await savePhoto(photoId, blobFile);
+        } catch(e){
+          console.error('savePhoto error', e);
+        }
+      }
+
+      if (currentEdit.id) {
+        state.p = state.p.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {nom: nomVal, prenom: prenomVal, grade,poste,weapon,items,notes,photoId}) : x);
+      } else {
+        state.p.unshift({ id: uid('p'), nom: nomVal, prenom: prenomVal, grade, poste, weapon, items, notes, photoId });
+      }
+      save(); closeModal(); renderPersonnel();
+    };
+
+    if(file){
+      finalize(file);
+    } else {
+      // keep existing photoId if any, or null
+      const prevPhotoId = currentEdit.id ? (state.p.find(x=>x.id===currentEdit.id)||{}).photoId : null;
+      if(prevPhotoId) {
+        // keep current photoId (no change)
+        finalize(null);
+      } else {
+        finalize(null);
+      }
+    }
+  } else if(k==='poste'){
+    const name = document.getElementById('m_name').value.trim(); if(!name){ alert('Nom requis'); return; }
+    const vl = document.getElementById('m_vl').value.trim();
+    const pilot = document.getElementById('m_pilot').value.trim();
+    const commander = document.getElementById('m_commander').value.trim();
+    const members = Array.from(document.querySelectorAll('#m_members_list input:checked')).map(c=>c.value);
+    if(currentEdit.id){ state.e = state.e.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {name,vl,pilot,commander,members}) : x); } else { state.e.unshift({ id: uid('e'), name, vl, pilot, commander, members }); }
+    save(); closeModal(); renderEquipes();
+  } else if(k==='organigramme'){
+    const title = document.getElementById('m_title').value.trim();
+    const notes = document.getElementById('m_notes_o') ? document.getElementById('m_notes_o').value.trim() : '';
+    const mission = document.getElementById('m_mission').value.trim();
+    const date = document.getElementById('m_date').value.trim();
+    const time = document.getElementById('m_time').value.trim();
+    const lieu = document.getElementById('m_lieu').value.trim();
+    const radio = document.getElementById('m_radio').value.trim();
+    const tenue = document.getElementById('m_tenue').value.trim();
+    const repas = document.getElementById('m_repas').value.trim();
+    const imageInput = modalBody.querySelector('#m_image');
+    const file = imageInput ? imageInput.files[0] : null;
+    const wrapper = modalBody.querySelector('div[style*="margin-top: 8px"]') || modalBody.querySelector('div:nth-last-child(1)');
+    const finalize = (image)=>{
+      if(currentEdit.id){ state.o = state.o.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {title,notes,mission,date,time,lieu,radio,tenue,repas,image}) : x); }
+      else { state.o.unshift({ id: uid('o'), title, notes, mission, date, time, lieu, radio, tenue, repas, image }); }
+      save(); closeModal(); renderOrganigrammes();
+    };
+    if(file){
+      const r=new FileReader();
+      r.onload=e=>finalize(e.target.result);
+      r.readAsDataURL(file);
+    } else {
+      const prev = wrapper && wrapper.dataset && wrapper.dataset.src ? wrapper.dataset.src : (currentEdit.id ? (state.o.find(x=>x.id===currentEdit.id)||{}).image : null);
+      finalize(prev);
+    }
+  }
+});
+
+/* ---------- PDF export (updated to handle photoId) ---------- */
+document.getElementById('exportPdf').addEventListener('click', async () => {
+  const root = document.getElementById('pdfRoot');
+  root.innerHTML = '';
+
+  const page = document.createElement('div');
+  page.style.width = '760px';
+  page.style.padding = '20px';
+  page.style.background = 'white';
+  page.style.fontSize = '12px';
+  page.style.fontFamily = 'Arial, sans-serif';
+
+ /* ---------- SYNTHÈSE / ORGANIGRAMME ---------- */
+const o = state.o[0] || {};
+const synth = document.createElement('div');
+synth.innerHTML = `
+  <h2 style="text-align:center;margin:0">ORGANIGRAMME</h2>
+  <hr />
+
+  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+    <div><strong>Mission :</strong> ${esc(o.mission || '')}</div>
+    <div><strong>Date :</strong> ${esc(o.date || '')}</div>
+    <div><strong>Heure :</strong> ${esc(o.time || '')}</div>
+  </div>
+
+  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+    <div><strong>Lieu :</strong> ${esc(o.lieu || '')}</div>
+    <div><strong>Radio :</strong> ${esc(o.radio || '')}</div>
+    <div><strong>Tenue :</strong> ${esc(o.tenue || '')}</div>
+  </div>
+
+  <div style="display:flex; justify-content:flex-start; margin-bottom:6px;">
+    <div style="margin-right:30px"><strong>Repas :</strong> ${esc(o.repas || '')}</div>
+  </div>
+
+  <div style="margin-top:6px">
+    <strong>Notes :</strong> ${esc(o.notes || '')}
+  </div>
+`;
+page.appendChild(synth);
+
+
+  /* ---------- POSTES EN 3 COLONNES ---------- */
+  const wrapper = document.createElement('div');
+  wrapper.style.display = 'grid';
+  wrapper.style.gridTemplateColumns = '1fr 1fr 1fr';
+  wrapper.style.gap = '12px';
+  wrapper.style.marginTop = '20px';
+
+  const equipes = ["INDIA 1", "INDIA 2", "INDIA 3"];
+
+  for (const eqName of equipes) {
+    const eqData = state.e.find(e => (e.name || '').toUpperCase() === eqName.toUpperCase());
+    const col = document.createElement('div');
+    col.style.border = '1px solid #ddd';
+    col.style.borderRadius = '6px';
+    col.style.padding = '8px';
+    col.style.background = '#fafafa';
+
+    col.innerHTML = `<h3 style="text-align:center;margin:4px 0">${eqName}</h3><hr/>`;
+
+    /* --- Pilote --- */
+    if (eqData && eqData.pilot) {
+      col.innerHTML += `
+        <div style="margin-bottom:6px">
+          <strong>Pilote :</strong> ${esc(eqData.pilot)}
+        </div>`;
+    }
+
+    /* --- Commandant de bord --- */
+    if (eqData && eqData.commander) {
+      col.innerHTML += `
+        <div style="margin-bottom:6px">
+          <strong>Commandant :</strong> ${esc(eqData.commander)}
+        </div>`;
+    }
+
+    col.innerHTML += `<hr/>`;
+
+    /* --- PERSONNEL DÉCLARÉ DANS state.p --- */
+   /* --- MEMBRES SÉLECTIONNÉS DE L'POSTE --- */
+    const membres = [];
+    if (eqData && Array.isArray(eqData.members)) {
+      for (const nom of eqData.members) {
+        const p = state.p.find(x => displayName(x) === nom);
+        if (p) membres.push(p);
+      }
+    }
+
+    for (const p of membres) {
+      const name = esc(displayName(p));
+      const item = document.createElement('div');
+      item.style.display = 'flex';
+      item.style.gap = '6px';
+      item.style.marginBottom = '6px';
+      item.style.alignItems = 'center';
+
+      let photoHTML = `<div style="width:50px;height:50px;border-radius:4px;background:#eee;overflow:hidden;display:flex;align-items:center;justify-content:center"><span style="font-weight:bold">${(name||"?")[0]}</span></div>`;
+      if (p.photoId) {
+        try {
+          const blob = await loadPhoto(p.photoId);
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+            photoHTML = `<div style="width:50px;height:50px;border-radius:4px;background:#eee;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${url}" style="width:100%;height:100%;object-fit:cover"></div>`;
+          }
+        } catch(e){
+          console.warn('load photo for pdf err', e);
+        }
+      }
+
+      item.innerHTML = `
+        ${photoHTML}
+        <div style="flex:1">
+          <strong>${name}</strong><br>
+          ${esc(p.grade || '')}<br>
+          <span style="font-size:11px"><strong>A:</strong> ${esc(p.weapon || '')}</span><br>
+          <span style="font-size:11px"><strong>M:</strong> ${esc(p.items || '')}</span>
+        </div>
+      `;
+      col.appendChild(item);
+    }
+
+    wrapper.appendChild(col);
+  }
+
+  page.appendChild(wrapper);
+  root.appendChild(page);
+
+  await waitForImages(root);
+
+  const canvas = await html2canvas(page, { scale: 2, useCORS: true });
+
+  const img = canvas.toDataURL('image/jpeg', 0.92);
+  const jsPDFLib = window.jspdf.jsPDF;
+  const pdf = new jsPDFLib({ unit: 'pt', format: 'a4' });
+
+  const pdfW = pdf.internal.pageSize.getWidth();
+  const pdfH = pdf.internal.pageSize.getHeight();
+  const ratio = Math.min(pdfW / canvas.width, pdfH / canvas.height);
+
+  const w = canvas.width * ratio;
+  const h = canvas.height * ratio;
+
+  pdf.addImage(img, 'JPEG', (pdfW - w) / 2, 10, w, h);
+  pdf.save('ordre_de_bataille.pdf');
+});
+
+
+function waitForImages(root){ return new Promise(resolve=>{ const imgs = Array.from(root.querySelectorAll('img')); if(imgs.length===0) return resolve(); let loaded=0,total=imgs.length; imgs.forEach(img=>{ if(img.complete) { loaded++; if(loaded===total) resolve(); } else { img.addEventListener('load', ()=>{ loaded++; if(loaded===total) resolve(); }); img.addEventListener('error', ()=>{ loaded++; if(loaded===total) resolve(); }); } }); setTimeout(()=>resolve(),4000); }); }
+</script>
+<button id="installBtn" onclick="installApp()" style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;background:#4263eb;color:white;border:none;font-weight:600;">Installer</button>
+<script>
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e=>{
+ e.preventDefault();
+ deferredPrompt=e;
+ document.getElementById('installBtn').style.display='block';
+});
+function installApp(){
+ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; }
+ document.getElementById('installBtn').style.display='none';
+}
+</script>
+</body>
+</html>

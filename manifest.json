@@ -1,0 +1,1 @@
+{"name": "SNPI", "short_name": "SNPI", "start_url": "snpi.html", "display": "standalone", "orientation": "portrait", "background_color": "#ffffff", "theme_color": "#ffffff", "icons": [{"src": "snpi.jpg", "sizes": "512x512", "type": "image/jpeg"}]}
