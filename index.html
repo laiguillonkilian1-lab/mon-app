@@ -1,182 +1,155 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Equipes">
-<link rel="apple-touch-icon" href="icon-192.png">
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("service-worker.js");
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ordre de Bataille — Final (Bleu)</title>
+
+  <!-- Manifest / Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- Fonts & libs -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+  :root{
+    --bg:#f4f7fb;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent:#0f1724;
+    --primary:#4263eb;
+    --danger:#ff6b6b;
+    --input-border:#e6eefc;
   }
-</script>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Ordre de Bataille — Final (Bleu)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<style>
-:root{
-  --bg:#f4f7fb;
-  --card:#ffffff;
-  --muted:#6b7280;
-  --accent:#0f1724;
-  --primary:#4263eb;
-  --danger:#ff6b6b;
-  --input-border:#e6eefc;
-}
-*{box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
-body{margin:0;background:var(--bg);color:var(--accent)}
-.header{background:#0f1724;color:white;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
-.header h1{margin:0;font-size:22px;letter-spacing:1px}
-.btn{background:transparent;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600}
-.btn.primary{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(66,99,235,0.18)}
-.container{max-width:1200px;margin:28px auto;padding:0 20px}
-.tabs{display:flex;gap:12px;margin-bottom:18px}
-.tab{padding:10px 18px;border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);font-weight:700;border:1px solid rgba(0,0,0,0.03)}
-.tab.active{background:#fff;color:var(--accent);box-shadow:0 10px 30px rgba(2,6,23,0.05)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
-.card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 8px 24px rgba(6,12,32,0.06)}
-.headerRow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.avatar{width:64px;height:64px;border-radius:12px;overflow:hidden;background:#d0d7ff;display:flex;align-items:center;justify-content:center;font-weight:700}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.name{font-weight:800;font-size:18px}
-.small{color:var(--muted);font-size:13px}
-.rowItem{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #f1f5f9}
-.controls{display:flex;gap:8px;margin-top:10px}
-.btn.warn{background:#ffe8e6;color:#b02a37}
-.btn.primary{background:#4263eb;color:white;}
-.top-right-fab{position:fixed;right:26px;bottom:26px;padding:14px 18px;border-radius:12px;background:var(--primary);color:white;border:none;box-shadow:0 18px 40px rgba(66,99,235,0.18);cursor:pointer}
-.modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:90}
-.modal{background:white;border-radius:12px;max-width:880px;width:100%;padding:18px;box-shadow:0 24px 60px rgba(2,6,23,0.4);max-height:90vh;overflow:auto}
-.form-grid{display:grid;gap:12px}
-.member-card{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#eaf0ff;border:1px solid #d0dcff;border-radius:10px;padding:6px 10px;cursor:pointer;transition:0.2s}
-.member-card.checked{background:#d8e1ff;border-color:#4263eb}
-.member-card .info{display:flex;align-items:center;gap:8px}
-.member-card .avatar-small{width:36px;height:36px;border-radius:8px;background:#4263eb;color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
-.member-card img{width:36px;height:36px;border-radius:8px;object-fit:cover}
-.org-thumb{width:160px;height:100px;border-radius:8px;overflow:hidden;background:#f4f7fb;display:flex;align-items:center;justify-content:center;color:#123a56}
-.preview-mission{background:linear-gradient(180deg,#fff,#fbfdff);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
-@media (max-width:900px){ .grid{grid-template-columns:1fr} .member-card{font-size:14px} }
+  *{box-sizing:border-box;font-family:Inter,system-ui,Arial,sans-serif}
+  body{margin:0;background:var(--bg);color:var(--accent)}
+  .header{background:#0f1724;color:white;padding:18px 28px;display:flex;align-items:center;justify-content:space-between}
+  .header h1{margin:0;font-size:22px;letter-spacing:1px}
 
-/* NEW: Modal form layout like screenshot */
-.form-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-.form-field{display:flex;flex-direction:column;gap:6px}
-.form-field label{font-size:13px;color:var(--muted);font-weight:700}
-.form-field input[type="text"], .form-field input[type="file"], .form-field textarea{padding:10px;border-radius:10px;border:1px solid var(--input-border);background:#fff;outline:none;font-size:14px}
-.form-field textarea{resize:vertical;padding-top:10px}
-.file-row{display:flex;gap:12px;align-items:center}
-.photo-preview{width:92px;height:92px;border-radius:50%;overflow:hidden;background:#eef3ff;display:flex;align-items:center;justify-content:center;border:4px solid #fff;box-shadow:0 8px 24px rgba(66,99,235,0.12)}
-.photo-preview img{width:100%;height:100%;object-fit:cover}
-.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
-.btn.secondary{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:10px 14px;border-radius:10px}
-.helper{font-size:13px;color:var(--muted)}
-.input-inline{display:flex;gap:8px}
-.full-width{grid-column:1/-1}
-.kv{color:var(--muted);font-size:13px}
-.notice{font-size:13px;color:var(--muted);margin-top:6px}
-</style>
+  /* Buttons */
+  .btn{border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:600;transition:all .15s ease}
+  .btn.primary{background:var(--primary);color:white;box-shadow:0 6px 18px rgba(66,99,235,0.18)}
+  .btn.primary:hover{opacity:.95}
+  .btn.secondary{background:transparent;border:1px solid rgba(2,6,23,0.06);padding:10px 14px;border-radius:10px}
+  .btn.warn{background:#ffe8e6;color:#b02a37}
 
-<link rel="manifest" href="manifest.json">
-<script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js');
-}
-</script>
+  .container{max-width:1200px;margin:28px auto;padding:0 20px}
+  .tabs{display:flex;gap:12px;margin-bottom:18px}
+  .tab{padding:10px 18px;border-radius:999px;background:var(--card);cursor:pointer;color:var(--muted);font-weight:700;border:1px solid rgba(0,0,0,0.03)}
+  .tab.active{background:#fff;color:var(--accent);box-shadow:0 10px 30px rgba(2,6,23,0.05)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+  .card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 8px 24px rgba(6,12,32,0.06)}
+  .headerRow{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .avatar{width:64px;height:64px;border-radius:12px;overflow:hidden;background:#d0d7ff;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  .name{font-weight:800;font-size:18px}
+  .small{color:var(--muted);font-size:13px}
+  .rowItem{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #f1f5f9}
+  .controls{display:flex;gap:8px;margin-top:10px}
+  .top-right-fab{position:fixed;right:26px;bottom:26px;padding:14px 18px;border-radius:12px;background:var(--primary);color:white;border:none;box-shadow:0 18px 40px rgba(66,99,235,0.18);cursor:pointer}
+  .modal-overlay{position:fixed;inset:0;background:rgba(2,6,23,0.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:90}
+  .modal{background:white;border-radius:12px;max-width:880px;width:100%;padding:18px;box-shadow:0 24px 60px rgba(2,6,23,0.4);max-height:90vh;overflow:auto}
+  .form-grid{display:grid;gap:12px}
+  .member-card{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#eaf0ff;border:1px solid #d0dcff;border-radius:10px;padding:6px 10px;cursor:pointer;transition:0.2s}
+  .member-card.checked{background:#d8e1ff;border-color:#4263eb}
+  .member-card .info{display:flex;align-items:center;gap:8px}
+  .member-card .avatar-small{width:36px;height:36px;border-radius:8px;background:#4263eb;color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
+  .org-thumb{width:160px;height:100px;border-radius:8px;overflow:hidden;background:#f4f7fb;display:flex;align-items:center;justify-content:center;color:#123a56}
+  .preview-mission{background:linear-gradient(180deg,#fff,#fbfdff);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+  .form-two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  .form-field{display:flex;flex-direction:column;gap:6px}
+  .form-field label{font-size:13px;color:var(--muted);font-weight:700}
+  .form-field input[type="text"], .form-field input[type="file"], .form-field textarea{padding:10px;border-radius:10px;border:1px solid var(--input-border);background:#fff;outline:none;font-size:14px}
+  .form-field textarea{resize:vertical;padding-top:10px}
+  .file-row{display:flex;gap:12px;align-items:center}
+  .photo-preview{width:92px;height:92px;border-radius:50%;overflow:hidden;background:#eef3ff;display:flex;align-items:center;justify-content:center;border:4px solid #fff;box-shadow:0 8px 24px rgba(66,99,235,0.12)}
+  .photo-preview img{width:100%;height:100%;object-fit:cover}
+  .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
+  .helper{font-size:13px;color:var(--muted)}
+  .input-inline{display:flex;gap:8px}
+  .full-width{grid-column:1/-1}
+  .kv{color:var(--muted);font-size:13px}
+  .notice{font-size:13px;color:var(--muted);margin-top:6px}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} .member-card{font-size:14px} }
+  </style>
 </head>
 <body>
-<div class="header">
-  <h1>ORDRE DE BATAILLE</h1>
-  <div>
-    <button id="exportPdf" class="btn primary">Exporter en PDF</button>
-  </div>
-</div>
-
-<div class="container">
-  <div class="tabs">
-    <div class="tab active" data-view="personnel">PERSONNEL</div>
-    <div class="tab" data-view="equipes">POSTES</div>
-    <div class="tab" data-view="organigrammes">ORGANIGRAMMES</div>
+  <div class="header">
+    <h1>ORDRE DE BATAILLE</h1>
+    <div><button id="exportPdf" class="btn primary">Exporter en PDF</button></div>
   </div>
 
-  <div id="view"></div>
-</div>
-
-<button class="top-right-fab" id="addBtn">＋ Ajouter</button>
-
-<div id="modalRoot" class="modal-overlay" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <h3 id="modalTitle" style="margin:0">Ajouter</h3>
-      <button id="closeModal" style="background:transparent;border:none;font-size:20px;cursor:pointer">✕</button>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-view="personnel">PERSONNEL</div>
+      <div class="tab" data-view="equipes">POSTES</div>
+      <div class="tab" data-view="organigrammes">ORGANIGRAMMES</div>
     </div>
-    <div id="modalBody"></div>
-    <div class="form-actions" style="margin-top:12px">
-      <button id="cancelModal" class="btn secondary">Annuler</button>
-      <button id="saveModal" class="btn primary">Enregistrer</button>
+
+    <div id="view"></div>
+  </div>
+
+  <button class="top-right-fab" id="addBtn">＋ Ajouter</button>
+
+  <div id="modalRoot" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h3 id="modalTitle" style="margin:0">Ajouter</h3>
+        <button id="closeModal" style="background:transparent;border:none;font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div id="modalBody"></div>
+      <div class="form-actions" style="margin-top:12px">
+        <button id="cancelModal" class="btn secondary">Annuler</button>
+        <button id="saveModal" class="btn primary">Enregistrer</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div id="pdfRoot" style="position:fixed;left:-9999px;top:-9999px;width:800px"></div>
+  <div id="pdfRoot" style="position:fixed;left:-9999px;top:-9999px;width:800px"></div>
 
 <script>
-/* ---------- data + helpers (conserved) ---------- */
-const LS_KEY='odb_final_bleu';
+/* ======================
+   Data + helpers (fixed)
+   ====================== */
+const LS_KEY = 'odb_final_bleu';
 const DEFAULT = {
- p: [
-  {id:'p4', nom:'BONNOT', grade:'LTN', poste:'CDP', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p5', nom:'PETIBON', grade:'MJR', poste:'CDPA', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p6', nom:'BRACHET', grade:'ADJ/C', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p7', nom:'CHALM', grade:'ADJ', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p8', nom:'BOURAS', grade:'ADJ', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p9', nom:'CROISSANT', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p10', nom:'LAIGUILLON', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p11', nom:'FRANKE', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p12', nom:'BERRUE', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p13', nom:'POINTEAU', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p14', nom:'MEAL', grade:'MDC', poste:'CDG', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p15', nom:'CUVILLIER', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p16', nom:'SIMON', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p17', nom:'MARTY', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p18', nom:'PORTUGAL', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p19', nom:'RICHAR', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p20', nom:'PETIT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p21', nom:'ROPARS', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p22', nom:'VIRMONT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p23', nom:'PLAUD', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p24', nom:'MERIEAU', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null},
-  {id:'p25', nom:'FERRIOT', grade:'GND', poste:'I', weapon:'FAMAS', items:'', photoId: null}
-],
+  p: [
+    {id:'p4', nom:'BONNOT', prenom:'', grade:'LTN', poste:'CDP', weapon:'FAMAS', items:'', photoId: null},
+    {id:'p5', nom:'PETIBON', prenom:'', grade:'MJR', poste:'CDPA', weapon:'FAMAS', items:'', photoId: null},
+    {id:'p6', nom:'BRACHET', prenom:'', grade:'ADJ/C', poste:'CDG', weapon:'FAMAS', items:'', photoId: null}
+    // ... (tu peux garder le reste de l'initialisation si nécessaire)
+  ],
   e: [
-    {id:'e1',name:'INDIA 1',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
-    {id:'e2',name:'INDIA 2',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
-    {id:'e3',name:'INDIA 3',vl:'AB-111-AA',pilot:'',commander:'',members:['','']},
+    {id:'e1',name:'INDIA 1',vl:'GQ-586-WJ',pilot:'',commander:'',members:['','']},
+    {id:'e2',name:'INDIA 2',vl:'GQ-802-WJ',pilot:'',commander:'',members:['','']},
+    {id:'e3',name:'INDIA 3',vl:'GQ-698-WJ',pilot:'',commander:'',members:['','']}
   ],
   o: [
-    {id:'o1',title:'Fiche synthèse mission',image:null,notes:'',mission:'Opération Mistral',date:'18/11/2025',time:'09:30',lieu:'Zone Delta',radio:'Canal 3',tenue:'Tenue de combat',repas:'12:30'}
+    {id:'o1',title:'Fiche synthèse mission',image:null,notes:'',mission:'Opération Mistral',date:'18/11/2025',time:'09:30',lieu:'Zone Delta',radio:'DIR 833',tenue:'Tenue 4S',repas:'12:30'}
   ]
 };
 let state = JSON.parse(localStorage.getItem(LS_KEY) || JSON.stringify(DEFAULT));
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
 function uid(pref='id'){ return pref+'-'+Math.random().toString(36).slice(2,9); }
 function esc(s){ if(s==null) return ''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* Safer displayName: prefer prenom + nom, otherwise nom as-is */
 function displayName(p){
   if(!p) return '';
-  if(p.prenom && p.nom) return (p.prenom + ' ' + p.nom).trim();
-  if(p.nom) {
-    const parts = String(p.nom).trim().split(/\s+/);
-    if(parts.length>=2) return parts[0] + ' ' + parts.slice(1).join(' ');
-    return p.nom;
-  }
+  const prenom = (p.prenom || '').trim();
+  const nom = (p.nom || '').trim();
+  if(prenom && nom) return (prenom + ' ' + nom).trim();
+  if(prenom) return prenom;
+  if(nom) return nom;
   return '';
 }
 
-/* -----------------------------------------
-   IndexedDB pour stocker les photos (BLOBS)
-------------------------------------------*/
+/* =========================
+   IndexedDB for photos
+   ========================= */
 const DB_NAME = 'odb_photos_db';
 const STORE_NAME = 'photos';
 
@@ -184,7 +157,9 @@ function openDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, 1);
     req.onupgradeneeded = () => {
-      req.result.createObjectStore(STORE_NAME);
+      if(!req.result.objectStoreNames.contains(STORE_NAME)){
+        req.result.createObjectStore(STORE_NAME);
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -192,12 +167,13 @@ function openDB() {
 }
 
 async function savePhoto(id, blob) {
+  if(!id || !blob) return;
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
     tx.objectStore(STORE_NAME).put(blob, id);
     tx.oncomplete = resolve;
-    tx.onerror = reject;
+    tx.onerror = () => reject(tx.error || new Error('IndexedDB save error'));
   });
 }
 
@@ -208,7 +184,7 @@ async function loadPhoto(id) {
     const tx = db.transaction(STORE_NAME, "readonly");
     const req = tx.objectStore(STORE_NAME).get(id);
     req.onsuccess = () => resolve(req.result || null);
-    req.onerror = reject;
+    req.onerror = () => reject(req.error || new Error('IndexedDB load error'));
   });
 }
 
@@ -219,40 +195,53 @@ async function deletePhoto(id) {
     const tx = db.transaction(STORE_NAME, "readwrite");
     tx.objectStore(STORE_NAME).delete(id);
     tx.oncomplete = resolve;
-    tx.onerror = reject;
+    tx.onerror = () => reject(tx.error || new Error('IndexedDB delete error'));
   });
 }
 
-/* ---------- rendering ---------- */
+/* =========================
+   Rendering
+   ========================= */
 const view = document.getElementById('view');
+const addBtn = document.getElementById('addBtn');
 
 async function renderPersonnel(){
   addBtn.style.display='block';
   let html = '<div class="grid">';
-
   for (const p of state.p) {
-    let photoURL = "";
+    let photoHTML = (displayName(p)||'?')[0];
     if (p.photoId) {
       try {
         const blob = await loadPhoto(p.photoId);
-        if (blob) photoURL = URL.createObjectURL(blob);
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          photoHTML = `<img src="${url}" alt="${esc(displayName(p))}">`;
+        }
       } catch(e){
         console.warn('photo load err', e);
       }
     }
-
-    const name = displayName(p);
-    html += `<div class="card"><div class="headerRow"><div class="avatar">${photoURL?`<img src="${photoURL}">`:(name||'')[0]||'?'}</div><div><div class="name">${esc(name)}</div><div class="small">${esc(p.grade)}</div></div></div>
-    <div class="rowItem"><div>Poste</div><div>${esc(p.poste||'')}</div></div>
-    <div class="rowItem"><div>Armement</div><div>${esc(p.weapon||'')}</div></div>
-    <div class="rowItem"><div>Matériels</div><div>${esc(p.items||'')}</div></div>
-    <div class="controls"><button class="btn primary editP" data-id="${p.id}">Modifier</button><button class="btn warn delP" data-id="${p.id}">Supprimer</button></div></div>`;
+    const name = esc(displayName(p));
+    html += `<div class="card"><div class="headerRow"><div class="avatar">${photoHTML}</div><div><div class="name">${name}</div><div class="small">${esc(p.grade)}</div></div></div>
+      <div class="rowItem"><div>Poste</div><div>${esc(p.poste||'')}</div></div>
+      <div class="rowItem"><div>Armement</div><div>${esc(p.weapon||'')}</div></div>
+      <div class="rowItem"><div>Matériels</div><div>${esc(p.items||'')}</div></div>
+      <div class="controls"><button class="btn primary editP" data-id="${p.id}">Modifier</button><button class="btn warn delP" data-id="${p.id}">Supprimer</button></div></div>`;
   }
   html += '</div>';
   view.innerHTML = `<div><h2 class="name">Personnel</h2>${html}</div>`;
 
-  document.querySelectorAll('.editP').forEach(b=>b.onclick=()=>openModal('personnel',b.dataset.id));
-  document.querySelectorAll('.delP').forEach(b=>b.onclick=async ()=>{ if(confirm('Supprimer ce personnel ?')){ const p = state.p.find(x=>x.id===b.dataset.id); if (p && p.photoId) await deletePhoto(p.photoId); state.p = state.p.filter(x=>x.id!==b.dataset.id); save(); renderPersonnel(); }});
+  document.querySelectorAll('.editP').forEach(b=>b.addEventListener('click', ()=>openModal('personnel',b.dataset.id)));
+  document.querySelectorAll('.delP').forEach(b=>b.addEventListener('click', async ()=>{
+    if(!confirm('Supprimer ce personnel ?')) return;
+    const id = b.dataset.id;
+    const p = state.p.find(x=>x.id===id);
+    if (p && p.photoId) {
+      try { await deletePhoto(p.photoId); } catch(e){ console.warn('delete photo err', e); }
+    }
+    state.p = state.p.filter(x=>x.id!==id);
+    save(); renderPersonnel();
+  }));
 }
 
 function renderEquipes(){
@@ -267,65 +256,117 @@ function renderEquipes(){
   });
   html += '</div>';
   view.innerHTML = `<div><h2 class="name">Postes</h2>${html}</div>`;
-  document.querySelectorAll('.editE').forEach(b=>b.onclick=()=>openModal('poste',b.dataset.id));
-  document.querySelectorAll('.delE').forEach(b=>b.onclick=()=>{ if(confirm('Supprimer cette poste ?')){ state.e = state.e.filter(x=>x.id!==b.dataset.id); save(); renderEquipes(); }});
+  document.querySelectorAll('.editE').forEach(b=>b.addEventListener('click', ()=>openModal('poste',b.dataset.id)));
+  document.querySelectorAll('.delE').forEach(b=>b.addEventListener('click', ()=>{
+    if(!confirm('Supprimer ce poste ?')) return;
+    state.e = state.e.filter(x=>x.id!==b.dataset.id);
+    save(); renderEquipes();
+  }));
 }
 
-function renderOrganigrammes(){
-  addBtn.style.display='none';
+function renderOrganigrammes() {
+  addBtn.style.display = 'none';
   const o = state.o[0] || {};
-  let html = `<div class="card preview-mission"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
-    <div style="flex:1"><h3 style="margin:0">FICHE SYNTHÈSE MISSION</h3><div class="small">Aperçu</div>
-    <div style="margin-top:12px"><strong>Mission:</strong> ${esc(o.mission||'')}</div>
-    <div style="margin-top:6px"><strong>Date:</strong> ${esc(o.date||'')}</div>
-    <div style="margin-top:6px"><strong>Heure:</strong> ${esc(o.time||'')}</div>
-    <div style="margin-top:6px"><strong>Lieu:</strong> ${esc(o.lieu||'')}</div></div>
-    <div style="width:220px">${o.image?`<img src="${o.image}" style="width:100%;height:140px;object-fit:cover;border-radius:8px">`:'<div class="org-thumb">No image</div>'}</div>
+
+  let html = `
+    <div class="card preview-mission" style="padding:20px">
+
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:18px">
+
+        <!-- COLONNE GAUCHE -->
+        <div style="flex:1">
+
+          <div style="margin-top:6px"><strong>Mission:</strong> ${esc(o.mission || '')}</div>
+          <div style="margin-top:6px"><strong>Date:</strong> ${esc(o.date || '')}</div>
+          <div style="margin-top:6px"><strong>Heure:</strong> ${esc(o.time || '')}</div>
+          <div style="margin-top:6px"><strong>Lieu:</strong> ${esc(o.lieu || '')}</div>
+
+          <!-- AJOUT RADIO + TENUE SOUS LIEU -->
+          <div style="margin-top:6px"><strong>Radio:</strong> ${esc(o.radio || '')}</div>
+          <div style="margin-top:6px"><strong>Tenue:</strong> ${esc(o.tenue || '')}</div>
+
+          <!-- BOUTON EN BAS COMME SUR LE SCREEN -->
+          <button class="btn primary btn-primary-mission" 
+                  style="margin-top:16px"
+                  id="editMissionBtn">
+            Modifier la fiche mission
+          </button>
+
+        </div>
+
+        <!-- IMAGE -->
+        <div style="width:220px">
+          ${
+            o.image
+              ? `<img src="${o.image}" style="width:100%;height:140px;object-fit:cover;border-radius:8px">`
+              : `<div class="org-thumb">No image</div>`
+          }
+        </div>
+
+      </div>
+
+      <!-- NOTES -->
+      <div style="margin-top:20px">
+        <strong>Notes:</strong>
+        <div>${esc(o.notes || '')}</div>
+      </div>
+
     </div>
-    <div style="margin-top:12px"><strong>Notes:</strong><div>${esc(o.notes||'')}</div></div></div>`;
+  `;
+
   view.innerHTML = `<div><h2 class="name">Organigrammes</h2>${html}</div>`;
-  // add edit button
-  const editBtn = document.createElement('button');
-  editBtn.textContent = 'Modifier la fiche mission';
-  editBtn.className = 'btn ghost';
-  editBtn.onclick = ()=>openModal('organigramme', state.o[0]?.id || null);
-  view.querySelector('.card.preview-mission').prepend(editBtn);
+
+  // → Activation bouton édition
+  const btn = document.getElementById("editMissionBtn");
+  if (btn) {
+    btn.addEventListener("click", () =>
+      openModal("organigramme", state.o[0]?.id || null)
+    );
+  }
 }
+
 
 /* tabs */
-document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); const v = t.dataset.view; if(v==='personnel') renderPersonnel(); if(v==='equipes') renderEquipes(); if(v==='organigrammes') renderOrganigrammes(); }));
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click', ()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  const v = t.dataset.view;
+  if(v==='personnel') renderPersonnel();
+  if(v==='equipes') renderEquipes();
+  if(v==='organigrammes') renderOrganigrammes();
+}));
 
 // initial view
 renderPersonnel();
 
-/* ---------- modal logic (new unified style) ---------- */
+/* ======================
+   Modal logic (unified)
+   ====================== */
 const modalRoot = document.getElementById('modalRoot'), modalBody = document.getElementById('modalBody'), modalTitle = document.getElementById('modalTitle');
 document.getElementById('addBtn').addEventListener('click', ()=>{ const v = document.querySelector('.tab.active').dataset.view; openModal(v, null); });
-document.getElementById('closeModal').addEventListener('click', ()=>{ closeModal(); });
-document.getElementById('cancelModal').addEventListener('click', ()=>{ closeModal(); });
+document.getElementById('closeModal').addEventListener('click', closeModal);
+document.getElementById('cancelModal').addEventListener('click', closeModal);
 let currentEdit = null;
 
 function closeModal(){
   modalRoot.style.display='none';
   currentEdit=null;
   modalBody.innerHTML='';
+  modalTitle.textContent = '';
 }
 
-/* openModal builds a nicer form per kind */
+function safeQuery(root, selector){ try{ return root ? root.querySelector(selector) : null; } catch(e){ return null; } }
+
+/* openModal builds form per kind (with defensive checks) */
 function openModal(kind, id=null){
   currentEdit = {kind,id};
   modalTitle.textContent = (id ? 'Modifier ' : 'Ajouter ') + (kind==='personnel'?'personne': kind==='poste'?'poste':'organigramme');
   modalBody.innerHTML = '';
+
   if(kind==='personnel'){
-    // find existing or default
-    const p = id ? state.p.find(x=>x.id===id) : {nom:'',prenom:'',grade:'',poste:'',weapon:'',items:'',photoId:null};
-    // heuristic split if only single name present
-    let prenom = p.prenom || '';
-    let nom = p.nom || '';
-    if(!p.prenom && p.nom){
-      const parts = String(p.nom).trim().split(/\s+/);
-      if(parts.length>=2){ prenom = parts[0]; nom = parts.slice(1).join(' '); }
-    }
+    const p = id ? (state.p.find(x=>x.id===id) || {}) : {nom:'',prenom:'',grade:'',poste:'',weapon:'',items:'',notes:'',photoId:null};
+    const prenom = p.prenom || '';
+    const nom = p.nom || '';
     modalBody.innerHTML = `
       <div class="form-grid">
         <div class="form-two-col">
@@ -362,36 +403,38 @@ function openModal(kind, id=null){
         <div class="full-width form-field"><label>Notes</label><textarea id="m_notes" rows="3" placeholder="Rôle, capacités...">${esc(p.notes||'')}</textarea></div>
       </div>
     `;
-    // wire photo input preview
-    const input = modalBody.querySelector('#m_photo_input');
-    const preview = modalBody.querySelector('#previewPhoto');
-    input.addEventListener('change', (ev)=>{
-      const f = ev.target.files[0];
-      if(!f) return;
-      const r = new FileReader();
-      r.onload = e => {
-        // set preview img or replace content
-        if(preview.querySelector('img')) preview.querySelector('img').src = e.target.result;
-        else preview.innerHTML = `<img id="modalPreviewImg" src="${e.target.result}">`;
-        // store the file object on the input element for finalize
-        input._file = f;
-      };
-      r.readAsDataURL(f);
-    });
+    // photo input preview wiring
+    const input = safeQuery(modalBody, '#m_photo_input');
+    const preview = safeQuery(modalBody, '#previewPhoto');
+    if(input){
+      input.addEventListener('change', (ev)=>{
+        const f = ev.target.files && ev.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = e => {
+          if(preview){
+            preview.innerHTML = `<img id="modalPreviewImg" src="${e.target.result}">`;
+            input._file = f; // save File for later
+            input._dataUrl = e.target.result;
+          }
+        };
+        r.readAsDataURL(f);
+      });
+    }
     // load existing photo if available
     if(p.photoId){
       loadPhoto(p.photoId).then(blob=>{
         if(blob){
           const url = URL.createObjectURL(blob);
-          const img = modalBody.querySelector('#modalPreviewImg');
+          const img = safeQuery(modalBody, '#modalPreviewImg');
           if(img) img.src = url;
         }
-      }).catch(()=>{});
+      }).catch(()=>{/* ignore */});
     }
   }
 
   if(kind==='poste'){
-    const e = id? state.e.find(x=>x.id===id) : {name:'',vl:'',pilot:'',commander:'',members:[]};
+    const e = id? (state.e.find(x=>x.id===id) || {}) : {name:'',vl:'',pilot:'',commander:'',members:[]};
     modalBody.innerHTML = `
       <div class="form-grid">
         <div class="form-two-col">
@@ -409,30 +452,33 @@ function openModal(kind, id=null){
         </div>
       </div>
     `;
-    const list = modalBody.querySelector('#m_members_list');
-    state.p.forEach(p=>{
-      const card = document.createElement('label');
-      card.className = 'member-card';
-      const info = document.createElement('div'); info.className='info';
-      const av = document.createElement('div'); av.className='avatar-small';
-      if(p.photoId){ 
-        const img = document.createElement('img'); 
-        img.src = ''; // will set async
-        av.innerHTML=''; av.appendChild(img); 
-        loadPhoto(p.photoId).then(blob=>{ if(blob) img.src = URL.createObjectURL(blob); }).catch(()=>{});
-      } else av.textContent = (displayName(p)||'?')[0];
-      const txt = document.createElement('div'); txt.innerHTML = `<div style="font-weight:700;color:#1e293b">${esc(displayName(p))}</div><div style="font-size:12px;color:#475569">${esc(p.grade||'')}</div>`;
-      info.appendChild(av); info.appendChild(txt);
-      const cb = document.createElement('input'); cb.type='checkbox'; cb.value = displayName(p);
-      if((e.members||[]).includes(displayName(p))){ cb.checked = true; card.classList.add('checked'); }
-      cb.addEventListener('change', ()=> card.classList.toggle('checked', cb.checked) );
-      card.appendChild(info); card.appendChild(cb);
-      list.appendChild(card);
-    });
+    const list = safeQuery(modalBody, '#m_members_list');
+    if(list){
+      state.p.forEach(p=>{
+        const card = document.createElement('label');
+        card.className = 'member-card';
+        const info = document.createElement('div'); info.className='info';
+        const av = document.createElement('div'); av.className='avatar-small';
+        if(p.photoId){
+          const img = document.createElement('img');
+          img.alt = displayName(p);
+          av.appendChild(img);
+          loadPhoto(p.photoId).then(blob=>{ if(blob) img.src = URL.createObjectURL(blob); }).catch(()=>{});
+        } else av.textContent = (displayName(p)||'?')[0];
+        const txt = document.createElement('div');
+        txt.innerHTML = `<div style="font-weight:700;color:#1e293b">${esc(displayName(p))}</div><div style="font-size:12px;color:#475569">${esc(p.grade||'')}</div>`;
+        info.appendChild(av); info.appendChild(txt);
+        const cb = document.createElement('input'); cb.type='checkbox'; cb.value = displayName(p);
+        if((e.members||[]).includes(displayName(p))){ cb.checked = true; card.classList.add('checked'); }
+        cb.addEventListener('change', ()=> card.classList.toggle('checked', cb.checked) );
+        card.appendChild(info); card.appendChild(cb);
+        list.appendChild(card);
+      });
+    }
   }
 
   if(kind==='organigramme'){
-    const o = id? state.o.find(x=>x.id===id) : state.o[0] || {title:'',image:null,notes:'',mission:'',date:'',time:'',lieu:'',radio:'',tenue:'',repas:''};
+    const o = id? (state.o.find(x=>x.id===id) || state.o[0] || {}) : state.o[0] || {};
     modalBody.innerHTML = `
       <div class="form-grid">
         <div class="form-two-col">
@@ -458,55 +504,57 @@ function openModal(kind, id=null){
         <div class="full-width form-field"><label>Notes</label><textarea id="m_notes_o" rows="3">${esc(o.notes||'')}</textarea></div>
       </div>
     `;
-    // image preview handling
-    const input = modalBody.querySelector('#m_image');
+    // image preview wrapper
+    const inputImg = safeQuery(modalBody, '#m_image');
     const wrapper = document.createElement('div');
     wrapper.style.marginTop = '8px';
-    if(o.image) wrapper.innerHTML = `<img src="${o.image}" style="width:240px;border-radius:8px">`;
+    if(o.image) { wrapper.innerHTML = `<img src="${o.image}" style="width:240px;border-radius:8px">`; wrapper.dataset.src = o.image; }
     modalBody.appendChild(wrapper);
-    input.addEventListener('change', (ev)=>{
-      const f = ev.target.files[0];
-      if(!f) return;
-      const r = new FileReader();
-      r.onload = e => { wrapper.innerHTML = `<img src="${e.target.result}" style="width:240px;border-radius:8px">`; wrapper.dataset.src = e.target.result; };
-      r.readAsDataURL(f);
-    });
-    if(o.image) wrapper.dataset.src = o.image;
+    if(inputImg){
+      inputImg.addEventListener('change', (ev)=>{
+        const f = ev.target.files && ev.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = e => { wrapper.innerHTML = `<img src="${e.target.result}" style="width:240px;border-radius:8px">`; wrapper.dataset.src = e.target.result; };
+        r.readAsDataURL(f);
+      });
+    }
   }
 
-  modalRoot.style.display='flex';
+  modalRoot.style.display = 'flex';
 }
 
-/* ---------- saveModal handles all three types ---------- */
+/* ===========================
+   Save modal changes (all)
+   =========================== */
 document.getElementById('saveModal').addEventListener('click', async ()=>{
   if(!currentEdit) return;
   const k = currentEdit.kind;
+
   if(k==='personnel'){
-    const nomVal = document.getElementById('m_nom').value.trim();
-    const prenomVal = document.getElementById('m_prenom').value.trim();
+    const nomVal = (safeQuery(modalBody,'#m_nom')?.value || '').trim();
+    const prenomVal = (safeQuery(modalBody,'#m_prenom')?.value || '').trim();
     if(!nomVal && !prenomVal){ alert('Au moins le Nom ou le Prénom est requis'); return; }
-    const grade = document.getElementById('m_grade').value.trim();
-    const poste = document.getElementById('m_poste').value.trim();
-    const weapon = document.getElementById('m_weapon').value.trim();
-    const items = document.getElementById('m_items').value.trim();
-    const notes = document.getElementById('m_notes') ? document.getElementById('m_notes').value.trim() : '';
-    // photo
-    const photoInput = modalBody.querySelector('#m_photo_input');
-    const file = photoInput ? photoInput._file || (photoInput.files && photoInput.files[0]) : null;
+    const grade = (safeQuery(modalBody,'#m_grade')?.value || '').trim();
+    const poste = (safeQuery(modalBody,'#m_poste')?.value || '').trim();
+    const weapon = (safeQuery(modalBody,'#m_weapon')?.value || '').trim();
+    const items = (safeQuery(modalBody,'#m_items')?.value || '').trim();
+    const notes = (safeQuery(modalBody,'#m_notes')?.value || '').trim();
 
-    const finalize = async (blobFile) =>{
-      let photoId = currentEdit.id ? (state.p.find(x => x.id === currentEdit.id)?.photoId || uid('ph')) : uid('ph');
+    // photo handling
+    const photoInput = safeQuery(modalBody,'#m_photo_input');
+    const file = photoInput ? (photoInput._file || (photoInput.files && photoInput.files[0])) : null;
 
-      if (blobFile) {
-        // store file blob in IndexedDB
-        try {
-          await savePhoto(photoId, blobFile);
-        } catch(e){
-          console.error('savePhoto error', e);
-        }
+    const finalize = async (blobFile, keepPhotoId=null) =>{
+      let photoId = keepPhotoId || uid('ph');
+      if(blobFile){
+        try{ await savePhoto(photoId, blobFile); } catch(e){ console.warn('savePhoto', e); }
+      } else {
+        // if no blobFile and keepPhotoId is null -> no photo
+        if(!keepPhotoId) photoId = null;
       }
 
-      if (currentEdit.id) {
+      if(currentEdit.id){
         state.p = state.p.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {nom: nomVal, prenom: prenomVal, grade,poste,weapon,items,notes,photoId}) : x);
       } else {
         state.p.unshift({ id: uid('p'), nom: nomVal, prenom: prenomVal, grade, poste, weapon, items, notes, photoId });
@@ -517,36 +565,39 @@ document.getElementById('saveModal').addEventListener('click', async ()=>{
     if(file){
       finalize(file);
     } else {
-      // keep existing photoId if any, or null
+      // keep prev photoId if editing
       const prevPhotoId = currentEdit.id ? (state.p.find(x=>x.id===currentEdit.id)||{}).photoId : null;
-      if(prevPhotoId) {
-        // keep current photoId (no change)
-        finalize(null);
-      } else {
-        finalize(null);
-      }
+      finalize(null, prevPhotoId || null);
     }
-  } else if(k==='poste'){
-    const name = document.getElementById('m_name').value.trim(); if(!name){ alert('Nom requis'); return; }
-    const vl = document.getElementById('m_vl').value.trim();
-    const pilot = document.getElementById('m_pilot').value.trim();
-    const commander = document.getElementById('m_commander').value.trim();
-    const members = Array.from(document.querySelectorAll('#m_members_list input:checked')).map(c=>c.value);
-    if(currentEdit.id){ state.e = state.e.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {name,vl,pilot,commander,members}) : x); } else { state.e.unshift({ id: uid('e'), name, vl, pilot, commander, members }); }
+    return;
+  }
+
+  if(k==='poste'){
+    const name = (safeQuery(modalBody,'#m_name')?.value || '').trim(); if(!name){ alert('Nom requis'); return; }
+    const vl = (safeQuery(modalBody,'#m_vl')?.value || '').trim();
+    const pilot = (safeQuery(modalBody,'#m_pilot')?.value || '').trim();
+    const commander = (safeQuery(modalBody,'#m_commander')?.value || '').trim();
+    const members = Array.from(modalBody.querySelectorAll('#m_members_list input:checked')).map(c=>c.value);
+    if(currentEdit.id){ state.e = state.e.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {name,vl,pilot,commander,members}) : x); }
+    else { state.e.unshift({ id: uid('e'), name, vl, pilot, commander, members }); }
     save(); closeModal(); renderEquipes();
-  } else if(k==='organigramme'){
-    const title = document.getElementById('m_title').value.trim();
-    const notes = document.getElementById('m_notes_o') ? document.getElementById('m_notes_o').value.trim() : '';
-    const mission = document.getElementById('m_mission').value.trim();
-    const date = document.getElementById('m_date').value.trim();
-    const time = document.getElementById('m_time').value.trim();
-    const lieu = document.getElementById('m_lieu').value.trim();
-    const radio = document.getElementById('m_radio').value.trim();
-    const tenue = document.getElementById('m_tenue').value.trim();
-    const repas = document.getElementById('m_repas').value.trim();
-    const imageInput = modalBody.querySelector('#m_image');
-    const file = imageInput ? imageInput.files[0] : null;
-    const wrapper = modalBody.querySelector('div[style*="margin-top: 8px"]') || modalBody.querySelector('div:nth-last-child(1)');
+    return;
+  }
+
+  if(k==='organigramme'){
+    const title = (safeQuery(modalBody,'#m_title')?.value || '').trim();
+    const notes = (safeQuery(modalBody,'#m_notes_o')?.value || '').trim();
+    const mission = (safeQuery(modalBody,'#m_mission')?.value || '').trim();
+    const date = (safeQuery(modalBody,'#m_date')?.value || '').trim();
+    const time = (safeQuery(modalBody,'#m_time')?.value || '').trim();
+    const lieu = (safeQuery(modalBody,'#m_lieu')?.value || '').trim();
+    const radio = (safeQuery(modalBody,'#m_radio')?.value || '').trim();
+    const tenue = (safeQuery(modalBody,'#m_tenue')?.value || '').trim();
+    const repas = (safeQuery(modalBody,'#m_repas')?.value || '').trim();
+    const imageInput = safeQuery(modalBody,'#m_image');
+    const file = imageInput ? (imageInput.files && imageInput.files[0]) : null;
+    const wrapper = modalBody.querySelector('div[style*="margin-top: 8px"]') || modalBody.lastElementChild;
+
     const finalize = (image)=>{
       if(currentEdit.id){ state.o = state.o.map(x=> x.id===currentEdit.id ? Object.assign({}, x, {title,notes,mission,date,time,lieu,radio,tenue,repas,image}) : x); }
       else { state.o.unshift({ id: uid('o'), title, notes, mission, date, time, lieu, radio, tenue, repas, image }); }
@@ -560,171 +611,172 @@ document.getElementById('saveModal').addEventListener('click', async ()=>{
       const prev = wrapper && wrapper.dataset && wrapper.dataset.src ? wrapper.dataset.src : (currentEdit.id ? (state.o.find(x=>x.id===currentEdit.id)||{}).image : null);
       finalize(prev);
     }
+    return;
   }
 });
 
-/* ---------- PDF export (updated to handle photoId) ---------- */
-document.getElementById('exportPdf').addEventListener('click', async () => {
-  const root = document.getElementById('pdfRoot');
-  root.innerHTML = '';
-
-  const page = document.createElement('div');
-  page.style.width = '760px';
-  page.style.padding = '20px';
-  page.style.background = 'white';
-  page.style.fontSize = '12px';
-  page.style.fontFamily = 'Arial, sans-serif';
-
- /* ---------- SYNTHÈSE / ORGANIGRAMME ---------- */
-const o = state.o[0] || {};
-const synth = document.createElement('div');
-synth.innerHTML = `
-  <h2 style="text-align:center;margin:0">ORGANIGRAMME</h2>
-  <hr />
-
-  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-    <div><strong>Mission :</strong> ${esc(o.mission || '')}</div>
-    <div><strong>Date :</strong> ${esc(o.date || '')}</div>
-    <div><strong>Heure :</strong> ${esc(o.time || '')}</div>
-  </div>
-
-  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-    <div><strong>Lieu :</strong> ${esc(o.lieu || '')}</div>
-    <div><strong>Radio :</strong> ${esc(o.radio || '')}</div>
-    <div><strong>Tenue :</strong> ${esc(o.tenue || '')}</div>
-  </div>
-
-  <div style="display:flex; justify-content:flex-start; margin-bottom:6px;">
-    <div style="margin-right:30px"><strong>Repas :</strong> ${esc(o.repas || '')}</div>
-  </div>
-
-  <div style="margin-top:6px">
-    <strong>Notes :</strong> ${esc(o.notes || '')}
-  </div>
-`;
-page.appendChild(synth);
-
-
-  /* ---------- POSTES EN 3 COLONNES ---------- */
-  const wrapper = document.createElement('div');
-  wrapper.style.display = 'grid';
-  wrapper.style.gridTemplateColumns = '1fr 1fr 1fr';
-  wrapper.style.gap = '12px';
-  wrapper.style.marginTop = '20px';
-
-  const equipes = ["INDIA 1", "INDIA 2", "INDIA 3"];
-
-  for (const eqName of equipes) {
-    const eqData = state.e.find(e => (e.name || '').toUpperCase() === eqName.toUpperCase());
-    const col = document.createElement('div');
-    col.style.border = '1px solid #ddd';
-    col.style.borderRadius = '6px';
-    col.style.padding = '8px';
-    col.style.background = '#fafafa';
-
-    col.innerHTML = `<h3 style="text-align:center;margin:4px 0">${eqName}</h3><hr/>`;
-
-    /* --- Pilote --- */
-    if (eqData && eqData.pilot) {
-      col.innerHTML += `
-        <div style="margin-bottom:6px">
-          <strong>Pilote :</strong> ${esc(eqData.pilot)}
-        </div>`;
-    }
-
-    /* --- Commandant de bord --- */
-    if (eqData && eqData.commander) {
-      col.innerHTML += `
-        <div style="margin-bottom:6px">
-          <strong>Commandant :</strong> ${esc(eqData.commander)}
-        </div>`;
-    }
-
-    col.innerHTML += `<hr/>`;
-
-    /* --- PERSONNEL DÉCLARÉ DANS state.p --- */
-   /* --- MEMBRES SÉLECTIONNÉS DE L'POSTE --- */
-    const membres = [];
-    if (eqData && Array.isArray(eqData.members)) {
-      for (const nom of eqData.members) {
-        const p = state.p.find(x => displayName(x) === nom);
-        if (p) membres.push(p);
-      }
-    }
-
-    for (const p of membres) {
-      const name = esc(displayName(p));
-      const item = document.createElement('div');
-      item.style.display = 'flex';
-      item.style.gap = '6px';
-      item.style.marginBottom = '6px';
-      item.style.alignItems = 'center';
-
-      let photoHTML = `<div style="width:50px;height:50px;border-radius:4px;background:#eee;overflow:hidden;display:flex;align-items:center;justify-content:center"><span style="font-weight:bold">${(name||"?")[0]}</span></div>`;
-      if (p.photoId) {
-        try {
-          const blob = await loadPhoto(p.photoId);
-          if (blob) {
-            const url = URL.createObjectURL(blob);
-            photoHTML = `<div style="width:50px;height:50px;border-radius:4px;background:#eee;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${url}" style="width:100%;height:100%;object-fit:cover"></div>`;
-          }
-        } catch(e){
-          console.warn('load photo for pdf err', e);
-        }
-      }
-
-      item.innerHTML = `
-        ${photoHTML}
-        <div style="flex:1">
-          <strong>${name}</strong><br>
-          ${esc(p.grade || '')}<br>
-          <span style="font-size:11px"><strong>A:</strong> ${esc(p.weapon || '')}</span><br>
-          <span style="font-size:11px"><strong>M:</strong> ${esc(p.items || '')}</span>
-        </div>
-      `;
-      col.appendChild(item);
-    }
-
-    wrapper.appendChild(col);
-  }
-
-  page.appendChild(wrapper);
-  root.appendChild(page);
-
-  await waitForImages(root);
-
-  const canvas = await html2canvas(page, { scale: 2, useCORS: true });
-
-  const img = canvas.toDataURL('image/jpeg', 0.92);
+/* =========================
+   PDF export (robust)
+   ========================= */
+   document.getElementById('exportPdf').addEventListener('click', async () => {
   const jsPDFLib = window.jspdf.jsPDF;
-  const pdf = new jsPDFLib({ unit: 'pt', format: 'a4' });
+  const pdf = new jsPDFLib({
+    orientation: "landscape",
+    unit: "pt",
+    format: "a4"
+  });
 
-  const pdfW = pdf.internal.pageSize.getWidth();
-  const pdfH = pdf.internal.pageSize.getHeight();
-  const ratio = Math.min(pdfW / canvas.width, pdfH / canvas.height);
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 40;
 
-  const w = canvas.width * ratio;
-  const h = canvas.height * ratio;
+  const colWidth = (pageWidth - margin * 2 - 40) / 3;
 
-  pdf.addImage(img, 'JPEG', (pdfW - w) / 2, 10, w, h);
-  pdf.save('ordre_de_bataille.pdf');
+  const o = state.o[0] || {};
+  let y = margin;
+
+  /* ===== HEADER ===== */
+  pdf.setFillColor(20, 30, 48); // bleu nuit
+  pdf.rect(0, 0, pageWidth, 60, "F");
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(24);
+  pdf.text("ORGANIGRAMME", pageWidth / 2, 36, { align: "center" });
+
+  pdf.setTextColor(0, 0, 0);
+  pdf.setFontSize(12);
+
+  y = 80;
+
+  pdf.text(`Mission : ${o.mission || ""}`, margin, y);
+  pdf.text(`Date : ${o.date || ""}`, pageWidth / 2, y);
+  y += 16;
+
+  pdf.text(`Lieu : ${o.lieu || ""}`, margin, y);
+  pdf.text(`Heure : ${o.time || ""}`, pageWidth / 2, y);
+  y += 16;
+
+  pdf.text(`Radio : ${o.radio || ""}`, margin, y);
+  pdf.text(`Tenue : ${o.tenue || ""}`, pageWidth / 2, y);
+  y += 16;
+
+  pdf.text(`Repas : ${o.repas || ""}`, margin, y);
+
+  y += 30;
+
+  /* ===== COLONNES DES ÉQUIPES ===== */
+  const teams = ["INDIA 1", "INDIA 2", "INDIA 3"];
+
+  for (let i = 0; i < 3; i++) {
+    const x = margin + i * (colWidth + 20);
+    let yCol = y;
+
+    const eqName = teams[i];
+    const eq = state.e.find(e => (e.name || "").toUpperCase() === eqName.toUpperCase()) || {};
+
+    /* TITRE COLORE */
+    pdf.setFillColor(32, 45, 70);
+    pdf.roundedRect(x, yCol, colWidth, 28, 6, 6, "F");
+
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(14);
+    pdf.text(eqName, x + colWidth / 2, yCol + 19, { align: "center" });
+
+    pdf.setTextColor(0, 0, 0);
+
+    /* CORPS */
+    yCol += 35;
+    pdf.setFillColor(245, 245, 245);
+    pdf.roundedRect(x, yCol, colWidth, pageHeight - yCol - margin, 6, 6, "F");
+
+    let yy = yCol + 20;
+
+    /* PILOTE / CDP */
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12);
+
+    pdf.text("Pilote :", x + 12, yy);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(eq.pilot || "-", x + 70, yy);
+    yy += 16;
+
+    pdf.setFont("helvetica", "bold");
+    pdf.text("Commandant :", x + 12, yy);
+    pdf.setFont("helvetica", "normal");
+    pdf.text(eq.commander || "-", x + 110, yy);
+
+    yy += 14;
+    pdf.setDrawColor(180);
+    pdf.line(x + 12, yy, x + colWidth - 12, yy);
+    yy += 20;
+
+    /* MEMBRES */
+    if (eq.members) {
+      for (const mName of eq.members) {
+        const p = state.p.find(pp => displayName(pp) === mName);
+        if (!p) continue;
+
+        /* PHOTO (carré) */
+        let imgSize = 50;
+
+        pdf.setDrawColor(120);
+        pdf.rect(x + 12, yy, imgSize, imgSize);
+
+        if (p.photoId) {
+          try {
+            const blob = await loadPhoto(p.photoId);
+            if (blob) {
+              const base64 = await blobToBase64(blob);
+              pdf.addImage(base64, "JPEG", x + 12, yy, imgSize, imgSize);
+            }
+          } catch {}
+        }
+
+        /* TEXTE */
+        const tx = x + 12 + imgSize + 10;
+
+        pdf.setFont("helvetica", "bold");
+        pdf.text((displayName(p) || "").toUpperCase(), tx, yy + 12);
+
+        pdf.setFont("helvetica", "normal");
+        pdf.text(p.grade || "-", tx, yy + 26);
+        pdf.text(`P : ${p.poste || "-"}`, tx, yy + 40);
+        pdf.text(`A : ${p.weapon || "-"}`, tx, yy + 54);
+        pdf.text(`M : ${p.items || "-"}`, tx, yy + 68);
+
+        yy += imgSize + 25;
+      }
+    }
+  }
+
+  pdf.save("organigramme.pdf");
 });
 
 
-function waitForImages(root){ return new Promise(resolve=>{ const imgs = Array.from(root.querySelectorAll('img')); if(imgs.length===0) return resolve(); let loaded=0,total=imgs.length; imgs.forEach(img=>{ if(img.complete) { loaded++; if(loaded===total) resolve(); } else { img.addEventListener('load', ()=>{ loaded++; if(loaded===total) resolve(); }); img.addEventListener('error', ()=>{ loaded++; if(loaded===total) resolve(); }); } }); setTimeout(()=>resolve(),4000); }); }
-</script>
-<button id="installBtn" onclick="installApp()" style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 16px;border-radius:10px;background:#4263eb;color:white;border:none;font-weight:600;">Installer</button>
-<script>
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', e=>{
- e.preventDefault();
- deferredPrompt=e;
- document.getElementById('installBtn').style.display='block';
-});
-function installApp(){
- if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt=null; }
- document.getElementById('installBtn').style.display='none';
+/* ===== HELPERS ===== */
+async function blobToBase64(blob) {
+  return await new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
 }
+
+/* =========================
+   Small utilities
+   ========================= */
+function installApp(){ /* noop if not used */ }
+
+/* =========================
+   Init service worker (single registration)
+   ========================= */
+if('serviceWorker' in navigator){
+  try{ navigator.serviceWorker.register('sw.js').catch(()=>{}); } catch(e){}
+}
+
 </script>
+
 </body>
 </html>
