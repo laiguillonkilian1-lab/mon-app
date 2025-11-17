@@ -1,4 +1,4 @@
-const CACHE_NAME = "app-equipes-v1";
+const CACHE_NAME = "Gestion Equipes";
 const FILES_TO_CACHE = [
   "./index.html",
   "./manifest.json"
